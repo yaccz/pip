@@ -1,6 +1,11 @@
 News for pip
 ============
 
+0.5.1
+-----
+
+* Fixed a couple little bugs, with git and with extensions.
+
 0.5
 ---
 
