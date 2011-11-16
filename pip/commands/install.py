@@ -150,6 +150,13 @@ class InstallCommand(Command):
             action='store_true',
             help='Install to user-site')
 
+        self.parser.add_option(
+            '--exclude',
+            dest='exclude',
+            metavar='<PKG>[,<PKG>]',
+            default=None,
+            help='Comma separated list of packages to excluce from installing')
+
     def _build_package_finder(self, options, index_urls):
         """
         Create a package finder appropriate to this install command.
@@ -180,9 +187,15 @@ class InstallCommand(Command):
             logger.notify('Ignoring indexes: %s' % ','.join(index_urls))
             index_urls = []
 
+        if options.exclude:
+            options.exclude = options.exclude.split(",")
+        else:
+            options.exclude = []
+
         finder = self._build_package_finder(options, index_urls)
 
         requirement_set = RequirementSet(
+            exclude=options.exclude,
             build_dir=options.build_dir,
             src_dir=options.src_dir,
             download_dir=options.download_dir,

@@ -776,7 +776,7 @@ class RequirementSet(object):
 
     def __init__(self, build_dir, src_dir, download_dir, download_cache=None,
                  upgrade=False, ignore_installed=False,
-                 ignore_dependencies=False):
+                 ignore_dependencies=False, exclude=[]):
         self.build_dir = build_dir
         self.src_dir = src_dir
         self.download_dir = download_dir
@@ -791,6 +791,7 @@ class RequirementSet(object):
         self.successfully_downloaded = []
         self.successfully_installed = []
         self.reqs_to_cleanup = []
+        self.exclude = exclude
 
     def __str__(self):
         reqs = [req for req in self.requirements.values()
@@ -799,6 +800,9 @@ class RequirementSet(object):
         return ' '.join([str(req.req) for req in reqs])
 
     def add_requirement(self, install_req):
+        if install_req.name in self.exclude:
+            return
+
         name = install_req.name
         if not name:
             self.unnamed_requirements.append(install_req)
@@ -1017,6 +1021,8 @@ class RequirementSet(object):
                                 continue
                             if self.has_requirement(name):
                                 ## FIXME: check for conflict
+                                continue
+                            if name in self.exclude:
                                 continue
                             subreq = InstallRequirement(req, req_to_install)
                             reqs.append(subreq)
